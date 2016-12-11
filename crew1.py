@@ -20,8 +20,6 @@ maxDutyTimeEndDec = 0.25
 maxDutyTimeStartHrs = datetime.strptime('00:30', "%H:%M")
 maxDutyTimeEndHrs = datetime.strptime('00:15', "%H:%M")
 
-
-
 #Simple hours per day of flying for testing
 futureWork = [3, 0, 8, 8, 7, 0, 5, 8, 7, 0, 5, 4]
 
@@ -38,8 +36,8 @@ futureFlightSchd =[{'ac': 'ABC', 'day': 1, 'start': '08 Dec 2016 10:00', 'end': 
                    {'ac': 'ABC', 'day': 5, 'start': '12 Dec 2016 08:00', 'end': '12 Dec 2016 12:35'}, \
                    {'ac': 'EFG', 'day': 5, 'start': '12 Dec 2016 14:00', 'end': '12 Dec 2016 16:00'}, \
                    {'ac': 'XYZ', 'day': 5, 'start': '12 Dec 2016 10:00', 'end': '12 Dec 2016 16:00'}, \
-                   {'ac': 'ABC', 'day': 7, 'start': '14 Dec 2016 10:00', 'end': '14 Dec 2016 16:15'}, \
-                   {'ac': 'EFG', 'day': 7, 'start': '14 Dec 2016 10:00', 'end': '14 Dec 2016 16:00'}, \
+                   {'ac': 'ABC', 'day': 7, 'start': '14 Dec 2016 10:00', 'end': '14 Dec 2016 13:15'}, \
+                   {'ac': 'STU', 'day': 7, 'start': '14 Dec 2016 15:00', 'end': '14 Dec 2016 18:25'}, \
                    {'ac': 'XYZ', 'day': 7, 'start': '14 Dec 2016 10:00', 'end': '14 Dec 2016 16:00'}]
 
 def futFliteSchdDec():
@@ -76,6 +74,7 @@ def combineFlts():
     lastDayValue = None
     lastEndTimeValue = None
     newFltTotTime = 0.0
+    counter = 0
     for fltRec in futureFlightSchd:
         #Check for enough time between flights
         fltTimeStart = datetime.strptime(fltRec['start'], "%d %b %Y %H:%M")
@@ -83,9 +82,26 @@ def combineFlts():
         totFltTime = float((fltTimeEnd - fltTimeStart).seconds / 3600.0)
         #Try to build separate flights into singles
         if fltRec['day'] == lastDayValue and lastEndTimeValue < fltTimeStart:
-            # Build ac list, store startTime
+            # Add flt to prior days flt - Build ac list, store startTime
             newFltTotTime += totFltTime
-            aircraftList = fltRec['ac']
+            if newFltTotTime < maxAirTime:
+                #UPDATE RECORD AND SECOND FLIGHTS DATA.
+                futFltSchdDecList[-1]['ac'].append(fltRec['ac'])
+                futFltSchdDecList[-1]['endDate'] = fltTimeEnd
+                futFltSchdDecList[-1]['totTime'] = newFltTotTime
+            else:
+                newFltTotTime = totFltTime
+                lastDayValue = fltRec['day']
+                lastEndTimeValue = datetime.strptime(fltRec['end'], "%d %b %Y %H:%M")
+                tempDict = fltRec
+                futFltSchdDec['ac'] = [fltRec['ac']]
+                futFltSchdDec['day'] = fltRec['day']
+                futFltSchdDec['startDate'] = fltTimeStart
+                futFltSchdDec['endDate'] = fltTimeEnd
+                futFltSchdDec['totTime'] = newFltTotTime
+                futFltSchdDec['valid'] = 1
+                futFltSchdDecList.append(futFltSchdDec)
+                futFltSchdDec = {}
         else:
             #write the record out to new List of Dicts
             newFltTotTime = totFltTime
@@ -100,28 +116,11 @@ def combineFlts():
             futFltSchdDec['valid'] = 1
             futFltSchdDecList.append(futFltSchdDec)
             futFltSchdDec = {}
+        counter += 1
+    return futFltSchdDecList
 
-
-
-
-    if newFltTotTime >= 13.00:
-        flag = False
-        futFltSchdDec['ac'] = fltRec['ac']
-        futFltSchdDec['day'] = fltRec['day']
-        futFltSchdDec['totTime'] = newFltTotTime
-        futFltSchdDecList.append(futFltSchdDec)
-        futFltSchdDec = {}
-    else:
-        flag  = True
-        futFltSchdDec['ac'] = fltRec['ac']
-        futFltSchdDec['day'] = fltRec['day']
-        futFltSchdDec['totTime'] = newFltTotTime
-        futFltSchdDecList.append(futFltSchdDec)
-        futFltSchdDec = {}
-
-
-
-print combineFlts()
+mark = combineFlts()
+print mark, len(mark)
 print futFliteSchdDec()
 
 def readEmpData(empHistInfo = employeePriorHours, factor=True):

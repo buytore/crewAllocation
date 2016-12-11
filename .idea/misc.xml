@@ -11,15 +11,4 @@
     <ConfirmationsSetting value="0" id="Remove" />
   </component>
   <component name="ProjectRootManager" version="2" project-jdk-name="Python 2.7.11 (~/anaconda/bin/python2.7)" project-jdk-type="Python SDK" />
-  <component name="PyConsoleOptionsProvider">
-    <option name="myPythonConsoleState">
-      <console-settings sdk-home="$USER_HOME$/anaconda/bin/python">
-        <option name="mySdkHome" value="$USER_HOME$/anaconda/bin/python" />
-      </console-settings>
-    </option>
-  </component>
-  <component name="SvnConfiguration">
-    <configuration>$USER_HOME$/.subversion</configuration>
-    <option name="runUnderTerminal" value="true" />
-  </component>
 </project>
