@@ -23,24 +23,40 @@ maxDutyTimeStartHrs = datetime.strptime('00:30', "%H:%M")
 maxDutyTimeEndHrs = datetime.strptime('00:15', "%H:%M")
 
 #Simple hours per day of flying for testing
-futureWork = [3, 0, 8, 8, 7, 0, 5, 8, 7, 0, 5, 4]
+#futureFlyingHrs = [3, 0, 8, 8, 7, 0, 5, 8, 7, 0, 5, 4]
+# Pairing 1 to 5 with 12 potential flight days
+futureFlyingHrs = [ [6.25, 0.00, 0.00, 6.25, 0.00, 0.00, 0.00, 0.00, 0.00, 6.25, 0.00, 4.75],
+                    [6.00, 0.00, 0.00, 6.00, 0.00, 0.00, 0.00, 0.00, 0.00, 6.00, 0.00, 0.00],
+                    [6.00, 0.00, 6.00, 6.00, 6.00, 0.00, 6.00, 0.00, 0.00, 6.00, 0.00, 6.00],
+                    [0.00, 0.00, 6.58, 0.00, 6.58, 0.00, 0.00, 0.00, 6.58, 0.00, 0.00, 0.00],
+                    [0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 6.67, 0.00, 0.00, 0.00, 0.00, 0.00]
+                  ]
+
 
 # Expected or Likely format from flight schedule - SQL call
-futureFlightSchd =[{'ac': 'ABC', 'day': 1, 'start': '08 Dec 2016 10:00', 'end': '08 Dec 2016 16:15'}, \
-                   {'ac': 'EFG', 'day': 1, 'start': '08 Dec 2016 10:00', 'end': '08 Dec 2016 16:00'}, \
+futureFlightSchd =[{'ac': 'ABC', 'day': 1, 'start': '08 Dec 2016 10:00', 'end': '08 Dec 2016 16:15'},\
+                   {'ac': 'EFG', 'day': 1, 'start': '08 Dec 2016 10:00', 'end': '08 Dec 2016 16:00'},\
                    {'ac': 'XYZ', 'day': 1, 'start': '08 Dec 2016 10:00', 'end': '08 Dec 2016 16:00'},\
-                   {'ac': 'ABC', 'day': 3, 'start': '10 Dec 2016 08:00', 'end': '10 Dec 2016 12:35'}, \
+                   {'ac': 'ABC', 'day': 3, 'start': '10 Dec 2016 08:00', 'end': '10 Dec 2016 12:35'},\
                    {'ac': 'EFG', 'day': 3, 'start': '10 Dec 2016 14:00', 'end': '10 Dec 2016 16:00'},\
-                   {'ac': 'XYZ', 'day': 3, 'start': '10 Dec 2016 10:00', 'end': '10 Dec 2016 16:00'}, \
-                   {'ac': 'ABC', 'day': 4, 'start': '11 Dec 2016 10:00', 'end': '11 Dec 2016 16:15'}, \
-                   {'ac': 'EFG', 'day': 4, 'start': '11 Dec 2016 10:00', 'end': '11 Dec 2016 16:00'}, \
-                   {'ac': 'XYZ', 'day': 4, 'start': '11 Dec 2016 10:00', 'end': '11 Dec 2016 16:00'}, \
-                   {'ac': 'ABC', 'day': 5, 'start': '12 Dec 2016 08:00', 'end': '12 Dec 2016 12:35'}, \
-                   {'ac': 'EFG', 'day': 5, 'start': '12 Dec 2016 14:00', 'end': '12 Dec 2016 16:00'}, \
-                   {'ac': 'XYZ', 'day': 5, 'start': '12 Dec 2016 10:00', 'end': '12 Dec 2016 16:00'}, \
-                   {'ac': 'ABC', 'day': 7, 'start': '14 Dec 2016 10:00', 'end': '14 Dec 2016 13:15'}, \
-                   {'ac': 'STU', 'day': 7, 'start': '14 Dec 2016 15:00', 'end': '14 Dec 2016 18:25'}, \
-                   {'ac': 'XYZ', 'day': 7, 'start': '14 Dec 2016 10:00', 'end': '14 Dec 2016 16:00'}]
+                   {'ac': 'XYZ', 'day': 3, 'start': '10 Dec 2016 10:00', 'end': '10 Dec 2016 16:00'},\
+                   {'ac': 'ABC', 'day': 4, 'start': '11 Dec 2016 10:00', 'end': '11 Dec 2016 16:15'},\
+                   {'ac': 'EFG', 'day': 4, 'start': '11 Dec 2016 10:00', 'end': '11 Dec 2016 16:00'},\
+                   {'ac': 'XYZ', 'day': 4, 'start': '11 Dec 2016 10:00', 'end': '11 Dec 2016 16:00'},\
+                   {'ac': 'ABC', 'day': 5, 'start': '12 Dec 2016 08:00', 'end': '12 Dec 2016 12:35'},\
+                   {'ac': 'EFG', 'day': 5, 'start': '12 Dec 2016 14:00', 'end': '12 Dec 2016 16:00'},\
+                   {'ac': 'XYZ', 'day': 5, 'start': '12 Dec 2016 10:00', 'end': '12 Dec 2016 16:00'},\
+                   {'ac': 'ABC', 'day': 7, 'start': '14 Dec 2016 10:00', 'end': '14 Dec 2016 13:15'},\
+                   {'ac': 'STU', 'day': 7, 'start': '14 Dec 2016 15:00', 'end': '14 Dec 2016 18:25'},\
+                   {'ac': 'XYZ', 'day': 7, 'start': '14 Dec 2016 10:00', 'end': '14 Dec 2016 16:00'},\
+                   {'ac': 'ABC', 'day': 9, 'start': '10 Dec 2016 08:00', 'end': '10 Dec 2016 12:35'},\
+                   {'ac': 'EFG', 'day': 9, 'start': '10 Dec 2016 14:00', 'end': '10 Dec 2016 16:00'},\
+                   {'ac': 'ABC', 'day': 10, 'start': '11 Dec 2016 10:00', 'end': '11 Dec 2016 16:15'},\
+                   {'ac': 'EFG', 'day': 10, 'start': '11 Dec 2016 10:00', 'end': '11 Dec 2016 16:00'},\
+                   {'ac': 'XYZ', 'day': 10, 'start': '11 Dec 2016 10:00', 'end': '11 Dec 2016 16:00'},\
+                   {'ac': 'ABC', 'day': 12, 'start': '12 Dec 2016 08:00', 'end': '12 Dec 2016 12:45'},\
+                   {'ac': 'XYZ', 'day': 12, 'start': '12 Dec 2016 10:00', 'end': '12 Dec 2016 16:00'}
+                   ]
 
 def futFliteSchdDec():
     futFltSchdDec = {}
@@ -181,7 +197,7 @@ def readEmpData(empHistInfo = employeePriorHours, factor=True):
             counter += 1
     return empData
 
-
+"""
 # PROBABLY NOT NECESSARY - BUT JUST IN CASE THE SQL REQUIRES
 # Make a list of employees and there associated prior hours of work - no Summing
 def readEmpTime():
@@ -194,7 +210,7 @@ def readEmpTime():
             hourList.append(month)
         empData[employee[0]] = hourList
     return empData
-
+"""
 
 def dayAvailSchdHours(empHistInfo = employeePriorHours):
     """Takes employees historical hours and adds them to future flying & VALIDATES
@@ -207,20 +223,21 @@ def dayAvailSchdHours(empHistInfo = employeePriorHours):
         empFuture = {}
         histTime = employee[1]
         histTime.reverse()
-        histTime.extend(futureWork)
-        for day in days:
-            tally = 0
-            histTimeA = histTime[1:13]
-            histTimeA.reverse()
-            count = 1
-            empFuture[employee[0]]=histTimeA
-            empCARsDict = readEmpData(empFuture)  #Validate the hours
-            if bool(empCARsDict):
-                schdFutureList.append(empCARsDict)
-                keyStr = str(day) + ''.join(empCARsDict.keys())
-                compFuture[keyStr]= schdFutureList
-            histTime.pop(0)
-            schdFutureList = []
+        for futureFlts in futureFlyingHrs:                # TODO NEED TO ADD Pairing key to DICT.
+            histTime.extend(futureFlts)                   # Need to replace with Pairing Schd Data
+            for day in days:
+                tally = 0
+                histTimeA = histTime[1:13]
+                histTimeA.reverse()
+                count = 1
+                empFuture[employee[0]]=histTimeA
+                empCARsDict = readEmpData(empFuture)  #Validate the hours
+                if bool(empCARsDict):
+                    schdFutureList.append(empCARsDict)
+                    keyStr = str(day) + ''.join(empCARsDict.keys())
+                    compFuture[keyStr]= schdFutureList
+                histTime.pop(0)
+                schdFutureList = []
     empCARsDict = {}
     schdFutureList = []
     return compFuture
@@ -248,12 +265,3 @@ def dayAvailSchdBinary(compFuture):
             else:
                 personAvailDutySchdBinary[name].append(0)
     return personAvailDutySchdBinary
-
-
-#employeeData = dayAvailSchdHours(employeePriorHours)
-#print dayAvailSchdBinary(employeeData)
-
-
-#print "This is in test - employeeData"
-#pprint(employeeData)
-#pprint(dayAvailSchdBinary(employeeData))
