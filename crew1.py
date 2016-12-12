@@ -1,9 +1,11 @@
 from collections import defaultdict
 from datetime import datetime
+from pprint import pprint
 
-employeePriorHours = {'Mark': [6, 4, 7, 3, 4, 9, 5, 7, 8, 6, 9 , 7],
-                    'Irina': [8, 4, 2, 3, 7, 9, 5, 7, 6, 6, 5, 4],
-                    'Bijan': [3, 6, 9, 3, 6, 9, 5, 7, 8, 6, 9, 7]}
+# hours in LIST are day1, day2, day3 , etc. So they need to be reversed at some point
+employeePriorHours = {'Mark': [6, 4, 7, 0, 4, 9, 5, 7, 8, 6, 9, 7],
+                    'Irina': [8, 3, 2, 6, 7, 8, 5, 7, 6, 6, 0, 4],
+                    'Bijan': [3, 6, 9, 3, 6, 9, 0, 5, 8, 6, 9, 7]}
 
 # Output =  one month < 10 total hours
 #           three months < 25 total hours
@@ -51,7 +53,6 @@ def futFliteSchdDec():
         futFltSchdDec['day'] = fltRec['day']
         futFltSchdDec['totTime'] = totFltTime
         futFltSchdDecList.append(futFltSchdDec)
-        print futFltSchdDec
         futFltSchdDec = {}
     return futFltSchdDecList
 
@@ -119,11 +120,14 @@ def combineFlts():
         counter += 1
     return futFltSchdDecList
 
-mark = combineFlts()
-print mark, len(mark)
-print futFliteSchdDec()
 
 def readEmpData(empHistInfo = employeePriorHours, factor=True):
+    """Takes in a Dict of Lists => hours
+       {empName: [1,2,3,4,5,6,7,8,9], empName2: [2,3,4,5,6,7,8,9,10]}
+       Creates a Dict of CARs Reg Hours for each empName
+       OUTPUT: DICT => empData
+       {empName: {'twelve': 71, 'six':31, 'three': 10, 'one': 2}} or multiple employee
+       can take single employee or multiple"""
     oneMonth = 0
     threeMonths = 0
     sixMonths = 0
@@ -134,8 +138,8 @@ def readEmpData(empHistInfo = employeePriorHours, factor=True):
         factorRate = 1.0
     maxOneMonth = 10 * factorRate
     maxThreeMonths = 25 * factorRate
-    maxSixMonths = 50 * factorRate
-    maxTwelveMonths = 75 * factorRate
+    maxSixMonths = 45 * factorRate
+    maxTwelveMonths = 65 * factorRate
 
     empData = {}
 
@@ -166,7 +170,7 @@ def readEmpData(empHistInfo = employeePriorHours, factor=True):
                     empData[employee[0]][keys[2]] = sixMonths
                 else:
                     del empData[employee[0]]
-                break
+                    break
             elif counter == 12:
                 twelveMonths = tally
                 if twelveMonths < maxTwelveMonths:
@@ -193,35 +197,42 @@ def readEmpTime():
 
 
 def dayAvailSchdHours(empHistInfo = employeePriorHours):
+    """Takes employees historical hours and adds them to future flying & VALIDATES
+       Exceedence does not get written out
+       OUTPUT: Dict => compFuture
+                {dayEmpName: [{EmpName:{CARsRule: Hrs, CARsRule: Hrs, CARsRule: Hrs, CARsRule: Hrs, etc}}]}"""
     compFuture = {}
     schdFutureList = []
     for employee in empHistInfo.iteritems():
         empFuture = {}
         histTime = employee[1]
+        histTime.reverse()
         histTime.extend(futureWork)
         for day in days:
             tally = 0
             histTimeA = histTime[1:13]
             histTimeA.reverse()
             count = 1
-            #futSchd = []
             empFuture[employee[0]]=histTimeA
-            mark = readEmpData(empFuture)  #Validate the hours
-            if bool(mark):
-                schdFutureList.append(mark)
-                keyStr = str(day) + ''.join(mark.keys())
+            empCARsDict = readEmpData(empFuture)  #Validate the hours
+            if bool(empCARsDict):
+                schdFutureList.append(empCARsDict)
+                keyStr = str(day) + ''.join(empCARsDict.keys())
                 compFuture[keyStr]= schdFutureList
             histTime.pop(0)
             schdFutureList = []
-    mark = {}
+    empCARsDict = {}
     schdFutureList = []
     return compFuture
 
 
 def dayAvailSchdBinary(compFuture):
-    """Takes a dict of list
-    key is employee name
-    record is Employee name & CARs hours"""
+    """ Takes a DICT of LIST = > compFuture structure
+        {dayEmpName: [{EmpName:{CARsRule: Hrs, CARsRule: Hrs, CARsRule: Hrs, CARsRule: Hrs, etc}}]}
+            key is dayEmpName
+            record is Employee name & CARs hours
+        OUTPUT: DICT => personAvailDutySchdBinary
+        {empName: [1,1,1,0,1,0,0,0,1,0,1,1], empName2: [0,1,1,1,0,0,1,1,1,0,1,0]... etc}"""
     personAvailDutySchd = defaultdict(list)
     for key, record in compFuture.iteritems():
         day = int(''.join(x for x in key if x.isdigit()))
@@ -240,4 +251,9 @@ def dayAvailSchdBinary(compFuture):
 
 
 employeeData = dayAvailSchdHours(employeePriorHours)
-print dayAvailSchdBinary(employeeData)
+#print dayAvailSchdBinary(employeeData)
+
+
+#print "This is in test - employeeData"
+#pprint(employeeData)
+#pprint(dayAvailSchdBinary(employeeData))
