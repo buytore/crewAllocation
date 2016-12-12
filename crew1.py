@@ -250,7 +250,7 @@ def dayAvailSchdBinary(compFuture):
     return personAvailDutySchdBinary
 
 
-employeeData = dayAvailSchdHours(employeePriorHours)
+#employeeData = dayAvailSchdHours(employeePriorHours)
 #print dayAvailSchdBinary(employeeData)
 
 
