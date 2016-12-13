@@ -1,6 +1,7 @@
 from collections import defaultdict
 from datetime import datetime
 from pprint import pprint
+import re
 
 # hours in LIST are day1, day2, day3 , etc. So they need to be reversed at some point
 employeePriorHours = {'Mark': [6, 4, 7, 0, 4, 9, 5, 7, 8, 6, 9, 7],
@@ -164,8 +165,8 @@ def readEmpData(empHistInfo = employeePriorHours, factor=True):
         tally = 0
         counter = 1
         #GET EMPLOYEE NAME and build DICT
-        for month in employee[1]:
-            tally += month
+        for empHours in employee[1]:
+            tally += empHours
             if counter == 1:
                 oneMonth = tally
                 if oneMonth < maxOneMonth:
@@ -197,20 +198,6 @@ def readEmpData(empHistInfo = employeePriorHours, factor=True):
             counter += 1
     return empData
 
-"""
-# PROBABLY NOT NECESSARY - BUT JUST IN CASE THE SQL REQUIRES
-# Make a list of employees and there associated prior hours of work - no Summing
-def readEmpTime():
-    empData = {}
-    for employee in employeePriorHours.iteritems():
-        hourList = []
-        empData[employee[0]] = {}
-        # GET EMPLOYEE NAME and build DICT
-        for month in employee[1]:
-            hourList.append(month)
-        empData[employee[0]] = hourList
-    return empData
-"""
 
 def dayAvailSchdHours(empHistInfo = employeePriorHours):
     """Takes employees historical hours and adds them to future flying & VALIDATES
@@ -223,7 +210,7 @@ def dayAvailSchdHours(empHistInfo = employeePriorHours):
         empFuture = {}
         histTime = employee[1]
         histTime.reverse()
-        for futureFlts in futureFlyingHrs:                # TODO NEED TO ADD Pairing key to DICT.
+        for pairing, futureFlts in enumerate(futureFlyingHrs):                # TODO NEED TO ADD Pairing key to DICT.
             histTime.extend(futureFlts)                   # Need to replace with Pairing Schd Data
             for day in days:
                 tally = 0
@@ -234,7 +221,7 @@ def dayAvailSchdHours(empHistInfo = employeePriorHours):
                 empCARsDict = readEmpData(empFuture)  #Validate the hours
                 if bool(empCARsDict):
                     schdFutureList.append(empCARsDict)
-                    keyStr = str(day) + ''.join(empCARsDict.keys())
+                    keyStr = str(pairing+1) + "-" + str(day) + "-" + ''.join(empCARsDict.keys())
                     compFuture[keyStr]= schdFutureList
                 histTime.pop(0)
                 schdFutureList = []
@@ -245,16 +232,20 @@ def dayAvailSchdHours(empHistInfo = employeePriorHours):
 
 def dayAvailSchdBinary(compFuture):
     """ Takes a DICT of LIST = > compFuture structure
-        {dayEmpName: [{EmpName:{CARsRule: Hrs, CARsRule: Hrs, CARsRule: Hrs, CARsRule: Hrs, etc}}]}
-            key is dayEmpName
+        {pairing-day-EmpName: [{EmpName:{CARsRule: Hrs, CARsRule: Hrs, CARsRule: Hrs, CARsRule: Hrs, etc}}]}
+            key is pairing-day-EmpName
             record is Employee name & CARs hours
         OUTPUT: DICT => personAvailDutySchdBinary
         {empName: [1,1,1,0,1,0,0,0,1,0,1,1], empName2: [0,1,1,1,0,0,1,1,1,0,1,0]... etc}"""
     personAvailDutySchd = defaultdict(list)
     for key, record in compFuture.iteritems():
-        day = int(''.join(x for x in key if x.isdigit()))
-        name = ''.join(x for x in key if not x.isdigit())
-        personAvailDutySchd[name].append(day)
+        pairingDay = re.findall('\d+', key)
+        pairing = pairingDay[0]
+        day = int(pairingDay[1])
+
+        #pairingDay = int(''.join(x for x in key if x.isdigit()))
+        dashName = ''.join(x for x in key if not x.isdigit())[2:]
+        personAvailDutySchd[dashName+pairing].append(day)
 
     sortedSchd = []
     personAvailDutySchdBinary = defaultdict(list)
