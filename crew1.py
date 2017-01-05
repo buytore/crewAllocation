@@ -35,11 +35,12 @@ futureFlyingHrs = [ [6.25, 0.00, 0.00, 6.25, 0.00, 0.00, 0.00, 0.00, 0.00, 6.25,
 
 
 # Expected or Likely format from flight schedule - SQL call
+# TEST DATA - Combines Day3, Day5, Day7 and Day9 flying
 futureFlightSchd =[{'ac': 'ABC', 'day': 1, 'start': '08 Dec 2016 10:00', 'end': '08 Dec 2016 16:15'},\
                    {'ac': 'EFG', 'day': 1, 'start': '08 Dec 2016 10:00', 'end': '08 Dec 2016 16:00'},\
                    {'ac': 'XYZ', 'day': 1, 'start': '08 Dec 2016 10:00', 'end': '08 Dec 2016 16:00'},\
                    {'ac': 'ABC', 'day': 3, 'start': '10 Dec 2016 08:00', 'end': '10 Dec 2016 12:35'},\
-                   {'ac': 'EFG', 'day': 3, 'start': '10 Dec 2016 14:00', 'end': '10 Dec 2016 16:00'},\
+                   {'ac': 'ABC', 'day': 3, 'start': '10 Dec 2016 14:00', 'end': '10 Dec 2016 16:00'},\
                    {'ac': 'XYZ', 'day': 3, 'start': '10 Dec 2016 10:00', 'end': '10 Dec 2016 16:00'},\
                    {'ac': 'ABC', 'day': 4, 'start': '11 Dec 2016 10:00', 'end': '11 Dec 2016 16:15'},\
                    {'ac': 'EFG', 'day': 4, 'start': '11 Dec 2016 10:00', 'end': '11 Dec 2016 16:00'},\
@@ -76,8 +77,8 @@ def futFliteSchdDec():
 
 def combineFlts():
     """Checks to ensure flight(s) do not exceed 13 hrs (Air Time - Duty)
-        Also checks if flight on same or different aircraft have 60 minute in between (can be operated by same crew)
-        OUTPUT: List of Dicts
+       Checks if flight on same aircraft & has 60 minute in between (SAME CREW CAN OPERATE)
+       OUTPUT: List of Dicts
                 [{'ac': ['abc', 'efg'], 'day': 1, 'startTime': 08:00, 'endTime': 16:15, totalTime: 8.25, valid: 1},
                  {'ac': ['xyz'], 'day': 1, 'startTime': 10:00, 'endTime': 16:30, totalTime: 6.30, valid: 1}"""
     futFltSchdDec = {}
@@ -231,7 +232,7 @@ def dayAvailSchdHours(empHistInfo = employeePriorHours):
 
 
 def dayAvailSchdBinary(compFuture):
-    """ Takes a DICT of LIST = > compFuture structure
+    """ Takes a DICT of LIST => compFuture structure
         {pairing-day-EmpName: [{EmpName:{CARsRule: Hrs, CARsRule: Hrs, CARsRule: Hrs, CARsRule: Hrs, etc}}]}
             key is pairing-day-EmpName
             record is Employee name & CARs hours
@@ -244,6 +245,33 @@ def dayAvailSchdBinary(compFuture):
         day = int(pairingDay[1])
 
         #pairingDay = int(''.join(x for x in key if x.isdigit()))
+        dashName = ''.join(x for x in key if not x.isdigit())[2:]
+        personAvailDutySchd[dashName+pairing].append(day)
+
+    sortedSchd = []
+    personAvailDutySchdBinary = defaultdict(list)
+    for name, schd in personAvailDutySchd.iteritems():
+        for i in days:
+            if i in schd:
+                personAvailDutySchdBinary[name].append(1)
+            else:
+                personAvailDutySchdBinary[name].append(0)
+    return personAvailDutySchdBinary
+
+
+def dayAvailSchdDaysOff(compFuture):
+    """ Takes a DICT of LIST => compFuture structure
+        {pairing-day-EmpName: [{EmpName:{CARsRule: Hrs, CARsRule: Hrs, CARsRule: Hrs, CARsRule: Hrs, etc}}]}
+            key is pairing-day-EmpName
+            record is Employee name & CARs hours
+        OUTPUT: DICT => personAvailDutySchdOff - CREW MEMBER CAN'T WORK MORE THAN 3 in 5
+        {empName: [1,1,1,0,1,0,0,0,1,0,1,1], empName2: [0,1,1,1,0,0,1,1,1,0,1,0]... etc}"""
+    personAvailDutySchd = defaultdict(list)
+    for key, record in compFuture.iteritems():
+        pairingDay = re.findall('\d+', key)
+        pairing = pairingDay[0]
+        day = int(pairingDay[1])
+
         dashName = ''.join(x for x in key if not x.isdigit())[2:]
         personAvailDutySchd[dashName+pairing].append(day)
 
