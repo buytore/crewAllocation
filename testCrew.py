@@ -1,4 +1,5 @@
 from crew1 import combineFlts, dayAvailSchdHours, dayAvailSchdBinary, employeePriorHours, futureFlyingHrs, dayAvailSchdDaysOff
+from visualsPy import convertDT
 from pprint import pprint
 
 # Create Pairings
@@ -7,6 +8,10 @@ mark = combineFlts()
 print "We are in Test: "
 pprint(mark)
 print "The length of flt records is: ", len(mark)
+
+convertDT(mark)
+#TODO build visualization of the pairing schedule
+
 
 #print convertToPairsHrs(mark)
 

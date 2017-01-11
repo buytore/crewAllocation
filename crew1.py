@@ -283,4 +283,5 @@ def dayAvailSchdDaysOff(compFuture):
                 personAvailDutySchdBinary[name].append(1)
             else:
                 personAvailDutySchdBinary[name].append(0)
+
     return personAvailDutySchdBinary
