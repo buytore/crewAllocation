@@ -2,6 +2,8 @@ from collections import defaultdict
 from datetime import datetime
 from pprint import pprint
 import re
+import pandas as pd
+import numpy as np
 
 # hours in LIST are day1, day2, day3 , etc. So they need to be reversed at some point
 employeePriorHours = {'Mark': [6, 4, 7, 0, 4, 9, 5, 7, 8, 6, 9, 7],
@@ -36,28 +38,28 @@ futureFlyingHrs = [ [6.25, 0.00, 0.00, 6.25, 0.00, 0.00, 0.00, 0.00, 0.00, 6.25,
 
 # Expected or Likely format from flight schedule - SQL call
 # TEST DATA - Combines Day3, Day5, Day7 and Day9 flying
-futureFlightSchd =[{'ac': 'ABC', 'day': 1, 'start': '08 Dec 2016 10:00', 'end': '08 Dec 2016 16:15'},\
-                   {'ac': 'EFG', 'day': 1, 'start': '08 Dec 2016 10:00', 'end': '08 Dec 2016 16:00'},\
-                   {'ac': 'XYZ', 'day': 1, 'start': '08 Dec 2016 10:00', 'end': '08 Dec 2016 16:00'},\
-                   {'ac': 'ABC', 'day': 3, 'start': '10 Dec 2016 08:00', 'end': '10 Dec 2016 12:35'},\
-                   {'ac': 'ABC', 'day': 3, 'start': '10 Dec 2016 14:00', 'end': '10 Dec 2016 16:00'},\
-                   {'ac': 'XYZ', 'day': 3, 'start': '10 Dec 2016 10:00', 'end': '10 Dec 2016 16:00'},\
-                   {'ac': 'ABC', 'day': 4, 'start': '11 Dec 2016 10:00', 'end': '11 Dec 2016 16:15'},\
-                   {'ac': 'EFG', 'day': 4, 'start': '11 Dec 2016 10:00', 'end': '11 Dec 2016 16:00'},\
-                   {'ac': 'XYZ', 'day': 4, 'start': '11 Dec 2016 10:00', 'end': '11 Dec 2016 16:00'},\
-                   {'ac': 'ABC', 'day': 5, 'start': '12 Dec 2016 08:00', 'end': '12 Dec 2016 12:35'},\
-                   {'ac': 'EFG', 'day': 5, 'start': '12 Dec 2016 14:00', 'end': '12 Dec 2016 16:00'},\
-                   {'ac': 'XYZ', 'day': 5, 'start': '12 Dec 2016 10:00', 'end': '12 Dec 2016 16:00'},\
-                   {'ac': 'ABC', 'day': 7, 'start': '14 Dec 2016 10:00', 'end': '14 Dec 2016 13:15'},\
-                   {'ac': 'STU', 'day': 7, 'start': '14 Dec 2016 15:00', 'end': '14 Dec 2016 18:25'},\
-                   {'ac': 'XYZ', 'day': 7, 'start': '14 Dec 2016 10:00', 'end': '14 Dec 2016 16:00'},\
-                   {'ac': 'ABC', 'day': 9, 'start': '10 Dec 2016 08:00', 'end': '10 Dec 2016 12:35'},\
-                   {'ac': 'EFG', 'day': 9, 'start': '10 Dec 2016 14:00', 'end': '10 Dec 2016 16:00'},\
-                   {'ac': 'ABC', 'day': 10, 'start': '11 Dec 2016 10:00', 'end': '11 Dec 2016 16:15'},\
-                   {'ac': 'EFG', 'day': 10, 'start': '11 Dec 2016 10:00', 'end': '11 Dec 2016 16:00'},\
-                   {'ac': 'XYZ', 'day': 10, 'start': '11 Dec 2016 10:00', 'end': '11 Dec 2016 16:00'},\
-                   {'ac': 'ABC', 'day': 12, 'start': '12 Dec 2016 08:00', 'end': '12 Dec 2016 12:45'},\
-                   {'ac': 'XYZ', 'day': 12, 'start': '12 Dec 2016 10:00', 'end': '12 Dec 2016 16:00'}
+futureFlightSchd =[{'ac': 'ABC', 'day': 1, 'start': '08 Nov 2016 10:00', 'end': '08 Nov 2016 16:15'},\
+                   {'ac': 'EFG', 'day': 1, 'start': '08 Nov 2016 10:00', 'end': '08 Nov 2016 16:00'},\
+                   {'ac': 'XYZ', 'day': 1, 'start': '08 Nov 2016 10:00', 'end': '08 Nov 2016 16:00'},\
+                   {'ac': 'ABC', 'day': 3, 'start': '10 Nov 2016 08:00', 'end': '10 Nov 2016 12:35'},\
+                   {'ac': 'ABC', 'day': 3, 'start': '10 Nov 2016 14:00', 'end': '10 Nov 2016 16:00'},\
+                   {'ac': 'XYZ', 'day': 3, 'start': '10 Nov 2016 10:00', 'end': '10 Nov 2016 16:00'},\
+                   {'ac': 'ABC', 'day': 4, 'start': '11 Nov 2016 10:00', 'end': '11 Nov 2016 16:15'},\
+                   {'ac': 'EFG', 'day': 4, 'start': '11 Nov 2016 10:00', 'end': '11 Nov 2016 16:00'},\
+                   {'ac': 'XYZ', 'day': 4, 'start': '11 Nov 2016 10:00', 'end': '11 Nov 2016 16:00'},\
+                   {'ac': 'ABC', 'day': 5, 'start': '12 Nov 2016 08:00', 'end': '12 Nov 2016 12:35'},\
+                   {'ac': 'EFG', 'day': 5, 'start': '12 Nov 2016 14:00', 'end': '12 Nov 2016 16:00'},\
+                   {'ac': 'XYZ', 'day': 5, 'start': '12 Nov 2016 10:00', 'end': '12 Nov 2016 16:00'},\
+                   {'ac': 'ABC', 'day': 7, 'start': '14 Nov 2016 10:00', 'end': '14 Nov 2016 13:15'},\
+                   {'ac': 'STU', 'day': 7, 'start': '14 Nov 2016 15:00', 'end': '14 Nov 2016 18:25'},\
+                   {'ac': 'XYZ', 'day': 7, 'start': '14 Nov 2016 10:00', 'end': '14 Nov 2016 16:00'},\
+                   {'ac': 'ABC', 'day': 9, 'start': '10 Nov 2016 08:00', 'end': '10 Nov 2016 12:35'},\
+                   {'ac': 'EFG', 'day': 9, 'start': '10 Nov 2016 14:00', 'end': '10 Nov 2016 16:00'},\
+                   {'ac': 'ABC', 'day': 10, 'start': '11 Nov 2016 10:00', 'end': '11 Nov 2016 16:15'},\
+                   {'ac': 'EFG', 'day': 10, 'start': '11 Nov 2016 10:00', 'end': '11 Nov 2016 16:00'},\
+                   {'ac': 'XYZ', 'day': 10, 'start': '11 Nov 2016 10:00', 'end': '11 Nov 2016 16:00'},\
+                   {'ac': 'ABC', 'day': 12, 'start': '12 Nov 2016 08:00', 'end': '12 Nov 2016 12:45'},\
+                   {'ac': 'XYZ', 'day': 12, 'start': '12 Nov 2016 10:00', 'end': '12 Nov 2016 16:00'}
                    ]
 
 def futFliteSchdDec():
@@ -137,6 +139,32 @@ def combineFlts():
             futFltSchdDec = {}
         counter += 1
     return futFltSchdDecList
+
+
+def convertDT(pairings):
+    ganttPairing = []
+    ganttPairingRec = []
+    for pairing in pairings:
+        ganttPairingRec.append(pairing['ac'])
+        ganttPairingRec.append(pairing['startDate'])
+        ganttPairingRec.append(pairing['endDate'])
+        ganttPairing.append(ganttPairingRec)
+        ganttPairingRec = []
+    df = pd.DataFrame(ganttPairing, columns=['PairingList', 'Start', 'End'])
+    df['Duration'] = df['End'] - df['Start']
+
+    df['StartText'] = df['Start'].apply(lambda x: x.strftime('Date(%Y, %m, %d, %H, %M, %S)'))
+    df['EndText'] = df['End'].apply(lambda x: x.strftime('Date(%Y, %m, %d, %H, %M, %S)'))
+
+    #df['total_days_td'] = df['Duration'].dt.total_seconds() / (24 * 60 * 60)
+
+    df['PairingID'] = df.PairingList.apply(' '.join)
+    df['Pairing'] = df['PairingID']
+    df['Resource'] = np.NaN
+    df['%Complete'] = np.NaN
+    df['Dependency'] = np.NaN
+    df = df[['PairingID', 'Pairing', 'Resource', 'StartText', 'EndText', 'Duration', '%Complete', 'Dependency']]
+    return df
 
 
 def readEmpData(empHistInfo = employeePriorHours, factor=True):

@@ -1,5 +1,4 @@
-from crew1 import combineFlts, dayAvailSchdHours, dayAvailSchdBinary, employeePriorHours, futureFlyingHrs, dayAvailSchdDaysOff
-from visualsPy import convertDT
+from crew1 import combineFlts, dayAvailSchdHours, dayAvailSchdBinary, employeePriorHours, futureFlyingHrs, dayAvailSchdDaysOff, convertDT
 from pprint import pprint
 
 # Create Pairings

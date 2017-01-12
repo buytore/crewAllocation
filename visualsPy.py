@@ -67,27 +67,6 @@ def CreateGanttChart(fname):
     plt.savefig('gantt.svg')
     plt.show()
 
-def convertDT(pairings):
-    ganttPairing = []
-    ganttPairingRec = []
-    for pairing in pairings:
-        ganttPairingRec.append(pairing['ac'])
-        ganttPairingRec.append(pairing['startDate'])
-        ganttPairingRec.append(pairing['endDate'])
-        ganttPairing.append(ganttPairingRec)
-        ganttPairingRec = []
-    df = pd.DataFrame(ganttPairing, columns=['Pairing', 'Start', 'End'])
-    df['Duration'] = df['End'] - df['Start']
-
-
-    df['total_days_td'] = df['Duration'].dt.total_seconds() / (24 * 60 * 60)
-
-
-    #df['Duration'].astype(float)
-    print df.info()
-    df.plot.barh()
-    return df
-
 
 if __name__ == '__main__':
     fname = r"projectChart.txt"
