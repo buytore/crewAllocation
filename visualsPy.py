@@ -78,15 +78,15 @@ def convertDT(pairings):
         ganttPairingRec = []
     df = pd.DataFrame(ganttPairing, columns=['Pairing', 'Start', 'End'])
     df['Duration'] = df['End'] - df['Start']
+
+
+    df['total_days_td'] = df['Duration'].dt.total_seconds() / (24 * 60 * 60)
+
+
     #df['Duration'].astype(float)
     print df.info()
-    df.plot.barh(df.index,df.values)
+    df.plot.barh()
     return df
-
-
-
-
-
 
 
 if __name__ == '__main__':
