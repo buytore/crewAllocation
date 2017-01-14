@@ -1,5 +1,6 @@
 from crew1 import combineFlts, dayAvailSchdHours, dayAvailSchdBinary, employeePriorHours, futureFlyingHrs, dayAvailSchdDaysOff, convertDT
 from pprint import pprint
+from googleDateConvert import formatPairings
 
 # Create Pairings
 
@@ -10,7 +11,9 @@ print "The length of flt records is: ", len(mark)
 
 convertDT(mark)
 #TODO build visualization of the pairing schedule
-
+pairingsList = combineFlts()
+cleanPairings = formatPairings(pairingsList)
+pairingsDF = convertDT(pairingsList)
 
 #print convertToPairsHrs(mark)
 

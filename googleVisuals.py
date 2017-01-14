@@ -3,22 +3,11 @@ import os
 import json
 from crew1 import combineFlts, convertDT
 import pandas as pd
+from googleDateConvert import formatPairings
 
 ##MARK's build - the FLASK interface and required connectors to data
 tmpl_dir = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'templates')
 app = Flask(__name__, template_folder=tmpl_dir)
-
-def formatPairings(pairingList):
-    formatGoogle = []
-    for newJSON in pairingList:
-        print newJSON
-        formatGoogle.append(newJSON['ac'])
-        formatGoogle.append(newJSON['ac'])
-        formatGoogle.append(newJSON['startDate'].strftime('%m/%d/%Y'))
-        formatGoogle.append(newJSON['endDate'].strftime('%m/%d/%Y'))
-    return True
-
-
 
 def getAllData(pairingList):
     #GOOGLE FORMAT FOR GANTT CHART
@@ -52,7 +41,8 @@ def ganttTest():
 
 @app.route("/gantt")
 def gantt():
-    json1 = getAllData(pairingsDF)
+#    json1 = getAllData(pairingsList)
+    json1 = formatPairings(pairingsList)
     #html1 = pairingDF.to_html()
     return render_template('gGantt.html', **locals())
 

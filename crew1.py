@@ -42,7 +42,7 @@ futureFlightSchd =[{'ac': 'ABC', 'day': 1, 'start': '08 Nov 2016 10:00', 'end': 
                    {'ac': 'EFG', 'day': 1, 'start': '08 Nov 2016 10:00', 'end': '08 Nov 2016 16:00'},\
                    {'ac': 'XYZ', 'day': 1, 'start': '08 Nov 2016 10:00', 'end': '08 Nov 2016 16:00'},\
                    {'ac': 'ABC', 'day': 3, 'start': '10 Nov 2016 08:00', 'end': '10 Nov 2016 12:35'},\
-                   {'ac': 'ABC', 'day': 3, 'start': '10 Nov 2016 14:00', 'end': '10 Nov 2016 16:00'},\
+                   {'ac': 'ABC', 'day': 3, 'start': '10 Nov 2016 14:00', 'end': '10 Nov 2016 16:35'},\
                    {'ac': 'XYZ', 'day': 3, 'start': '10 Nov 2016 10:00', 'end': '10 Nov 2016 16:00'},\
                    {'ac': 'ABC', 'day': 4, 'start': '11 Nov 2016 10:00', 'end': '11 Nov 2016 16:15'},\
                    {'ac': 'EFG', 'day': 4, 'start': '11 Nov 2016 10:00', 'end': '11 Nov 2016 16:00'},\

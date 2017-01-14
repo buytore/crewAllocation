@@ -7,48 +7,6 @@
     <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
     <script type="text/javascript">
 
-        function MassageTable(dataTable,ColumnIDMap) {
-        var dateCol = ColumnIDMap['timebin']; // your date column id should be defined here
-        for (var i=0;i<dataTable.getNumberOfRows();i++) {
-                dateVal = dataTable.getValue(i,dateCol);
-                //        If it's already a date, do nothing
-                if (dateVal instanceof Date) {continue;}
-                evalStr = 'new ' + dateVal;
-                newDate = eval(evalStr);
-                dataTable.setValue(i,dateCol,newDate);
-        }
-        return dataTable};
-
-    var testGantt = [
-                ['ABC', 'ABC', null, new Date(2016, 11, 08, 08, 15), new Date(2016, 11, 08, 16, 00), 22500000, null, null],
-                ['EFG', 'EFG', null, new Date(2016, 11, 08, 08, 15), new Date(2016, 11, 08, 16, 00), 21600000, null, null],
-                ['XYZ', 'XYZ', null, new Date(2016, 11, 10, 08, 30), new Date(2016, 11, 10, 16, 15), 21600000, null, null],
-                ['ABC ABC', 'ABC ABC', null, new Date(2016, 11, 12, 06, 00), new Date(2016, 11, 12, 16, 45), 28800000, null, null],
-                ['XYZ', 'XYZ', null, new Date(2016, 11, 14, 07, 45), new Date(2016, 11, 14, 18, 50), 21600000, null, null]
-                      ];
-    var testGantt2 = [
-                ['ABC', 'ABC', null, 'Date(2016, 11, 08, 08, 15)', 'Date(2016, 11, 08, 16, 00)', 22500000, null, null],
-                ['EFG', 'EFG', null, 'Date(2016, 11, 08, 08, 15)', 'Date(2016, 11, 08, 16, 00)', 21600000, null, null],
-                ['XYZ', 'XYZ', null, 'Date(2016, 11, 10, 08, 30)', 'Date(2016, 11, 10, 16, 15)', 21600000, null, null],
-                ['ABC ABC', 'ABC ABC', null, 'Date(2016, 11, 12, 06, 00)', 'Date(2016, 11, 12, 16, 45)', 28800000, null, null],
-                ['XYZ', 'XYZ', null, 'Date(2016, 11, 14, 07, 45)', 'Date(2016, 11, 14, 18, 50)', 21600000, null, null]
-                      ];
-
-    var testTimeLine = [
-                ['ABC', 'ABC', new Date(2016, 11, 08, 08, 15), new Date(2016, 11, 08, 16, 00)],
-                ['EFG', 'EFG', new Date(2016, 11, 08, 08, 15), new Date(2016, 11, 08, 16, 00)],
-                ['XYZ', 'XYZ', new Date(2016, 11, 10, 08, 30), new Date(2016, 11, 10, 16, 15)],
-                ['ABC ABC', 'ABC ABC', new Date(2016, 11, 12, 06, 00), new Date(2016, 11, 12, 16, 45)],
-                ['XYZ SUP', 'XYZ SUP', new Date(2016, 11, 14, 07, 45), new Date(2016, 11, 14, 18, 50)]
-                      ];
-    var testTimeLine2 = [
-                ['ABC', 'ABC', null, 'Date(2016, 11, 08, 08, 15)', 'Date(2016, 11, 08, 16, 00)', 22500000, null, null],
-                ['EFG', 'EFG', null, 'Date(2016, 11, 08, 08, 15)', 'Date(2016, 11, 08, 16, 00)', 21600000, null, null],
-                ['XYZ', 'XYZ', null, 'Date(2016, 11, 10, 08, 30)', 'Date(2016, 11, 10, 16, 15)', 21600000, null, null],
-                ['ABC ABC', 'ABC ABC', null, 'Date(2016, 11, 12, 06, 00)', 'Date(2016, 11, 12, 16, 45)', 28800000, null, null],
-                ['XYZ', 'XYZ', null, 'Date(2016, 11, 14, 07, 45)', 'Date(2016, 11, 14, 18, 50)', 21600000, null, null]
-                      ];
-
     var pairings = {{json1|safe}};
 
     google.charts.load('current', {'packages':['timeline']});
@@ -61,8 +19,7 @@
             data.addColumn('string', 'Name');
             data.addColumn('date', 'Start Date');
             data.addColumn('date', 'End Date');
-
-            data.addRows(testTimeLine);
+            data.addRows(pairings);
 
       var options = {
         height: 400,
@@ -72,7 +29,6 @@
       };
 
       var chart = new google.visualization.Timeline(document.getElementById('chart_div'));
-
       chart.draw(data, options);
     }
 
@@ -98,7 +54,6 @@
       };
 
       var chart = new google.visualization.Gantt(document.getElementById('chart_div'));
-
       chart.draw(data, options);
     }
   </script>
