@@ -2,17 +2,11 @@ import datetime
 import time
 from random import randint
 
-def formatPairings(pairingList):
-    formatGoogle = []
-    formatGoogleList = []
-    row_data = ''
+def formatPairingsTimeline(pairingList):
     formatGoogleList = ""
     row_data = ""
     count = 0
     for newJSON in pairingList:
-        #formatGoogle.append(" ".join(newJSON['ac']))
-        #formatGoogle.append(" ".join(newJSON['ac']))
-        #formatGoogle.append(newJSON['startDate'].strftime('%m/%d/%Y'))
         aircraftTail = " ".join(newJSON["ac"])
         if count >= 0 and count < len(pairingList) - 1:
             row_data += '["' + aircraftTail + '", "' + aircraftTail + '", ' + \

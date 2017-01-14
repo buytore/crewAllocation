@@ -3,7 +3,7 @@ import os
 import json
 from crew1 import combineFlts, convertDT
 import pandas as pd
-from googleDateConvert import formatPairings
+from googleDateConvert import formatPairingsTimeline
 
 ##MARK's build - the FLASK interface and required connectors to data
 tmpl_dir = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'templates')
@@ -25,7 +25,7 @@ def getAllData(pairingList):
     return json1
 
 pairingsList = combineFlts()
-cleanPairings = formatPairings(pairingsList)
+cleanPairings = formatPairingsTimeline(pairingsList)
 pairingsDF = convertDT(pairingsList)
 
 ########### ROUTING OPTIONS ###############
@@ -42,7 +42,7 @@ def ganttTest():
 @app.route("/gantt")
 def gantt():
 #    json1 = getAllData(pairingsList)
-    json1 = formatPairings(pairingsList)
+    json1 = formatPairingsTimeline(pairingsList)
     #html1 = pairingDF.to_html()
     return render_template('gGantt.html', **locals())
 
