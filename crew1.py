@@ -35,6 +35,12 @@ futureFlyingHrs = [ [6.25, 0.00, 0.00, 6.25, 0.00, 0.00, 0.00, 0.00, 0.00, 6.25,
                     [0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 6.67, 0.00, 0.00, 0.00, 0.00, 0.00]
                   ]
 
+# Dict of employee's actual work schedule - includes scheduled days off, training and vacation
+#                        NAME:    1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12
+employeeWorkSchedule = {"Bijan": [0, 0, 1, 1, 1, 1, 1, 0, 0, 1, 1, 1],
+                        "Mark":  [1, 1, 1, 1, 0, 0, 1, 1, 1, 1, 0, 0],
+                        "Irina": [0, 1, 1, 1, 1, 1, 1, 1, 0, 0, 1, 1]}
+
 
 # Expected or Likely format from flight schedule - SQL call
 # TEST DATA - Combines Day3, Day5, Day7 and Day9 flying
@@ -265,7 +271,8 @@ def dayAvailSchdBinary(compFuture):
             key is pairing-day-EmpName
             record is Employee name & CARs hours
         OUTPUT: DICT => personAvailDutySchdBinary
-        {empName: [1,1,1,0,1,0,0,0,1,0,1,1], empName2: [0,1,1,1,0,0,1,1,1,0,1,0]... etc}"""
+        {empName: [1,1,1,0,1,0,0,0,1,0,1,1], empName2: [0,1,1,1,0,0,1,1,1,0,1,0]... etc}
+        Creates a Dict with 1 or 0 as to whether the employee can be scheduled to work based on DUTY HOURS"""
     personAvailDutySchd = defaultdict(list)
     for key, record in compFuture.iteritems():
         pairingDay = re.findall('\d+', key)
@@ -275,10 +282,10 @@ def dayAvailSchdBinary(compFuture):
         #pairingDay = int(''.join(x for x in key if x.isdigit()))
         dashName = ''.join(x for x in key if not x.isdigit())[2:]
         personAvailDutySchd[dashName+pairing].append(day)
-
     sortedSchd = []
     personAvailDutySchdBinary = defaultdict(list)
     for name, schd in personAvailDutySchd.iteritems():
+        schd.sort()
         for i in days:
             if i in schd:
                 personAvailDutySchdBinary[name].append(1)
