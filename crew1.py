@@ -6,6 +6,7 @@ import pandas as pd
 import numpy as np
 
 # hours in LIST are day1, day2, day3 , etc. So they need to be reversed at some point
+#                              1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12 days
 employeePriorHours = {'Mark': [6, 4, 7, 0, 4, 9, 5, 7, 8, 6, 9, 7],
                     'Irina': [8, 3, 2, 6, 7, 8, 5, 7, 6, 6, 0, 4],
                     'Bijan': [3, 6, 9, 3, 6, 9, 0, 5, 8, 6, 9, 7]}
