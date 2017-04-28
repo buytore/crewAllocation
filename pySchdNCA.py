@@ -12,7 +12,7 @@ PeterFO = S.Resource('PeterFO')
 
 #Setup and create each job or task
 # OPTION TODO: add preflight Duty, flight and then post flight
-flight1 = S.Task('flight1', length=2.5)
+flight1 = S.Task('flight1', length=2)
 flight2 = S.Task('flight2', length=4)
 flight3 = S.Task('flight3', length=6)
 
