@@ -2,68 +2,64 @@ from pyschedule import Scenario, solvers, plotters, alt
 import random
 import time
 
-capName = ['A', 'B', 'C', 'D']
-foName =  ['E', 'F', 'G', 'H']
+capName = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H']
+#foName =  ['E', 'F', 'G', 'H']
 n_days = 14 # number of days
 days = list(range(n_days))
 
-max_seq = 5 # max number of consecutive shifts
-min_seq = 2 # min sequence without gaps
-max_work = 10 # max total number of shifts
-min_work = 7 # min total number of shifts
-max_weekend = 3 # max number of weekend shifts
+max_seq = 3 # max number of consecutive shifts
+min_seq = 1 # min sequence without gaps
+max_work = 14 # max total number of shifts
+min_work = 1 # min total number of shifts
+max_weekend = 1 # max number of weekend shifts
 
 # number of required shifts for each day
 shift_requirements =\
-{
-0: 5,
-1: 7,
-2: 6,
-3: 4,
-4: 5,
-5: 5,
-6: 5,
-7: 6,
-8: 7,
-9: 4,
-10: 2,
-11: 5,
-12: 6,
-13: 4
-}
+{   0: 3,
+    1: 1,
+    2: 2,
+    3: 3,
+    4: 2,
+    5: 1,
+    6: 2,
+    7: 2,
+    8: 2,
+    9: 1,
+    10: 2,
+    11: 3,
+    12: 2,
+    13: 2 }
 
 # specific shift requests by employees for days
 shift_requests =\
-[
-('A',0),
-('B',5),
-('C',8),
-('D',2),
-('E',9),
-('F',5),
-('G',1),
-('H',7),
-('A',3),
-('B',4),
-('C',4),
-('D',9),
-('F',1),
-('F',2),
-('F',3),
-('F',5),
-('F',7),
-('H',13)
-]
+[   ('A',0),
+    ('B',5),
+    ('C',8),
+    ('D',2),
+    ('E',9),
+    ('F',5),
+    ('G',1),
+    ('H',7),
+    ('A',3),
+    ('B',4),
+    ('C',4),
+    ('D',9),
+    ('F',1),
+    ('F',2),
+    ('F',3),
+    ('F',5),
+    ('F',7),
+    ('H',13) ]
 
 # Create employee scheduling scenari
 S = Scenario('employee_scheduling', horizon=n_days)
 
 # Create enployees as resources indexed by namesc
-employeeList = capName + foName
+employeeList = capName
 employees = {name: S.Resource(name) for name in employeeList}
 
 # Create shifts as tasks
-shifts = {(day, i): S.Task('S_%s_%s' % (str(day), str(i)))
+shifts = {(day, i): S.Task('S_%s_%s' % (str(day), str(i)),5)
           for day in shift_requirements if day in days
           for i in range(shift_requirements[day])}
 
@@ -107,7 +103,7 @@ for name in employees:
         S += employees[name][day:day + min_seq + 1].diff <= 1
 
 
-time_limit = 10  # time limit for each run
+time_limit = 15  # time limit for each run
 repeats = 5  # repeated random runs because CBC might get stuck
 
 # Iteratively add shift requests until no solution exists

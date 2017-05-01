@@ -10,7 +10,7 @@ MarkFO = S.Resource('MarkFO')
 PaulFO = S.Resource('PaulFO')
 PeterFO = S.Resource('PeterFO')
 SingleDay = S.Resource('Single_Day')
-Paint_Shop = S.Resource('Paint_Shop')
+#Paint_Shop = S.Resource('Paint_Shop')
 
 #Setup and create each job or task
 # OPTION TODO: add preflight Duty, flight and then post flight
@@ -47,6 +47,8 @@ Day4 += SingleDay
 Day5 += SingleDay
 Day6 += SingleDay
 Day7 += SingleDay
+
+flight1 += SingleDay
 
 S.clear_solution()
 S.use_makespan_objective()
