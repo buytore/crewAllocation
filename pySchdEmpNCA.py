@@ -31,7 +31,7 @@ shift_requirements =\
     12: 6,
     13: 4   }
 
-"""
+
 # number of required shifts for each day
 shift_requirements =\
 {   0: [3, (2, 6, 3)],
@@ -48,8 +48,24 @@ shift_requirements =\
     11: [3, (5, 3, 6)],
     12: [2, (6, 5)],
     13: [2, (3, 6)] }
+"""
 
-
+# number of required shifts for each day
+shift_requirements =\
+{   0: [2, 6, 3],
+    1: [5],
+    2: [2, 4],
+    3: [3, 3, 5],
+    4: [4, 3],
+    5: [7],
+    6: [3, 6],
+    7: [4, 6],
+    8: [6, 5],
+    9: [6],
+    10: [2, 4],
+    11: [5, 3, 6],
+    12: [6, 5],
+    13: [3, 6] }
 
 # specific shift requests by employees for days
 shift_requests =\
@@ -80,7 +96,7 @@ employeeList = capName + foName
 employees = {name: S.Resource(name) for name in employeeList}
 
 # Create shifts as tasks
-shifts = {(day, i): S.Task('S_%s_%s' % (str(day), str(i)), shift_requirements[day][0][i]) for day in shift_requirements if day in days for i in range(shift_requirements[day][0])}
+shifts = {(day, i): S.Task('S_%s_%s,%d' % (str(day), str(i), shift_requirements[day][i])) for day in shift_requirements if day in days for i in range(len(shift_requirements[day]))}
 
 # distribute shifts to days
 for day, i in shifts:
