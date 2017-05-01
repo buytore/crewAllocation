@@ -2,8 +2,8 @@ from pyschedule import Scenario, solvers, plotters, alt
 import random
 import time
 
-capName = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H']
-#foName =  ['E', 'F', 'G', 'H']
+capName = ['A', 'B', 'C', 'D']
+foName =  ['E', 'F', 'G', 'H']
 n_days = 14 # number of days
 days = list(range(n_days))
 
@@ -13,22 +13,43 @@ max_work = 14 # max total number of shifts
 min_work = 1 # min total number of shifts
 max_weekend = 1 # max number of weekend shifts
 
+"""
 # number of required shifts for each day
 shift_requirements =\
-{   0: 3,
-    1: 1,
-    2: 2,
-    3: 3,
-    4: 2,
-    5: 1,
-    6: 2,
-    7: 2,
-    8: 2,
-    9: 1,
+{   0: 5,
+    1: 7,
+    2: 6,
+    3: 4,
+    4: 5,
+    5: 5,
+    6: 5,
+    7: 6,
+    8: 7,
+    9: 4,
     10: 2,
-    11: 3,
-    12: 2,
-    13: 2 }
+    11: 5,
+    12: 6,
+    13: 4   }
+
+"""
+# number of required shifts for each day
+shift_requirements =\
+{   0: [3, (2, 6, 3)],
+    1: [1, (5)],
+    2: [2, (2, 4)],
+    3: [3, (3, 3, 5)],
+    4: [2, (4, 3)],
+    5: [1, (7)],
+    6: [2, (3, 6)],
+    7: [2, (4, 6)],
+    8: [2, (6, 5)],
+    9: [1, (6)],
+    10: [2, (2, 4)],
+    11: [3, (5, 3, 6)],
+    12: [2, (6, 5)],
+    13: [2, (3, 6)] }
+
+
 
 # specific shift requests by employees for days
 shift_requests =\
@@ -55,13 +76,11 @@ shift_requests =\
 S = Scenario('employee_scheduling', horizon=n_days)
 
 # Create enployees as resources indexed by namesc
-employeeList = capName
+employeeList = capName + foName
 employees = {name: S.Resource(name) for name in employeeList}
 
 # Create shifts as tasks
-shifts = {(day, i): S.Task('S_%s_%s' % (str(day), str(i)),5)
-          for day in shift_requirements if day in days
-          for i in range(shift_requirements[day])}
+shifts = {(day, i): S.Task('S_%s_%s' % (str(day), str(i)), shift_requirements[day][0][i]) for day in shift_requirements if day in days for i in range(shift_requirements[day][0])}
 
 # distribute shifts to days
 for day, i in shifts:
