@@ -3,6 +3,17 @@ import random
 import time
 
 employee_names = ['A','B','C','D','E','F','G','H']
+employeeNames = {
+    'Alice': 'Captain',
+    'Bob': 'Captain',
+    'John': 'Captain',
+    'Sarah': 'Captain',
+    'Mark': 'FO',
+    'Paul': 'FO',
+    'Peter': 'FO',
+    'Jay': 'FO'
+}
+
 n_days = 14 # number of days
 days = list(range(n_days))
 
@@ -61,6 +72,8 @@ JohnCap = S.Resource('JohnCap')
 MarkFO = S.Resource('MarkFO')
 PaulFO = S.Resource('PaulFO')
 PeterFO = S.Resource('PeterFO')
+
+crewResources = {'%s_%s' % (person, role): S.Task('%s_%s' % (person, role)) for person, role in employeeNames.iteritems() }
 
 shiftTasks = {'D%dS%d' % (day, nbrShift): S.Task('Day%d_Shift%d' % (day, nbrShift), shift_requirements[day][nbrShift]) for day in days for nbrShift in range(len(shift_requirements[day])) }
 
