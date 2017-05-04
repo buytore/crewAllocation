@@ -16,7 +16,7 @@ employeeNames = {
 n_days = 14 # number of days
 days = list(range(n_days))
 
-max_seq = 5 # max number of consecutive shifts
+max_seq = 3 # max number of consecutive shifts
 min_seq = 2 # min sequence without gaps
 max_work = 10 # max total number of shifts
 min_work = 7 # min total number of shifts
@@ -42,24 +42,24 @@ shift_requirements =\
 # specific shift requests by employees for days
 shift_requests =\
 [
-('Alice',0),
-('Bob',5),
-('John',8),
-('Sarah',2),
-('Mark',9),
-('Paul',5),
-('Peter',1),
-('Jay',7),
-('Alice',3),
-('Bob',4),
-('John',4),
-('Sarah',9),
-('Paul',1),
-('Paul',2),
-('Paul',3),
-('Paul',5),
-('Paul',7),
-('Jay',13)
+('Alice', 0),
+('Bob', 5),
+('John', 8),
+('Sarah', 2),
+('Mark', 9),
+('Paul', 5),
+('Peter', 1),
+('Jay', 7),
+('Alice', 3),
+('Bob', 4),
+('John', 4),
+('Sarah', 9),
+('Paul', 1),
+('Paul', 2),
+('Paul', 3),
+('Paul', 5),
+('Paul', 7),
+('Jay', 13)
 ]
 
 # Create employee scheduling scenari
@@ -69,6 +69,7 @@ S = Scenario('employee_scheduling', horizon=n_days)
 crewResourcesFO = [S.Resource('%s_%s' % (person, role)) for person, role in employeeNames.iteritems() if role == "FO"]
 crewResourcesCaptain = [S.Resource('%s_%s' % (person, role)) for person, role in employeeNames.iteritems() if role == "Captain"]
 
+#Build Shifts within Days as Tasks
 #shiftTasks = {'D%dS%d' % (day, nbrShift): S.Task('Day%d_Shift%d' % (day, nbrShift), shift_requirements[day][nbrShift]) for day in days for nbrShift in range(len(shift_requirements[day])) }
 shiftTasks = {(day, nbrShift): S.Task('Day%d_Shift%d' % (day, nbrShift), shift_requirements[day][nbrShift]) for day in days for nbrShift in range(len(shift_requirements[day])) }
 
@@ -82,37 +83,62 @@ for day, i in shiftTasks:
     if day % 7 in {5, 6}:
         shiftTasks[day, i].week_end = 1
 
-        # Add resources to Tasks
+        # Add resources to Tasks - should look at a way to eliminate "unavailable crew members" at this point.
     shiftTasks[day, i] += alt(crewResourcesFO), alt(crewResourcesCaptain)
 
 
 print shiftTasks
 
+employees = crewResourcesCaptain + crewResourcesFO
+# Capacity restrictions
+for name in employees:
+    # Maximal number of shifts
+    S += name <= max_work
+    # Minimal number of shifts
+    S += name >= min_work
+    # Maximal number of weekend shifts using attribute week_end
+    S += name['week_end'] <= max_weekend
+
+# Max number of consecutive shifts
+for name in employees:
+    for day in range(n_days):
+        S += name[day:day + max_seq + 1] <= max_seq
+
+# Min sequence without gaps
+for name in employees:
+    # No increase in last periods
+    S += name[n_days - min_seq:].inc <= 0
+    # No decrease in first periods
+    S += name[:min_seq].dec <= 0
+    # No diff during time horizon
+    for day in days[:-min_seq]:
+        S += name[day:day + min_seq + 1].diff <= 1
+
+
+
+
 time_limit = 10  # time limit for each run
 repeats = 5  # repeated random runs because CBC might get stuck
 
-
-
+"""
 ## NEED TO FIGURE THIS OUT ##
 # Iteratively add shift requests until no solution exists
-employees = crewResourcesCaptain + crewResourcesFO
 for name, day in shift_requests:
     resourceName = name+"_"+employeeNames[name]
-    S += employees[resourceName][day] >= 1
+    S += name[day] >= 1
     for i in range(repeats):
         random_seed = random.randint(0, 10000)
         start_time = time.time()
-        status = solvers.mip.solve(S, kind='CBC', time_limit=time_limit,
-                                   random_seed=random_seed, msg=0)
+        status = solvers.mip.solve(S, kind='CBC', time_limit=time_limit, random_seed=random_seed, msg=0)
         # Break when solution found
         if status:
             break
     print(name, day, 'compute time:', time.time() - start_time)
     # Break if all computed solution runs fail
     if not status:
-        S -= employees[resourceName][day] >= 1
+        S -= name[day] >= 1
         print('cant fit last shift request')
-
+"""
 # Plot the last computed solution
 #plotters.matplotlib.plot(S, fig_size=(12, 5))
 

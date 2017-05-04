@@ -77,6 +77,7 @@ for day, i in shifts:
 for day, i in shifts:
     shifts[day, i] += alt(S.resources())
 
+
 # Capacity restrictions
 for name in employees:
     # Maximal number of shifts
