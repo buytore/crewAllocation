@@ -2,7 +2,6 @@ from pyschedule import Scenario, solvers, plotters, alt
 import random
 import time
 
-employee_names = ['A','B','C','D','E','F','G','H']
 employeeNames = {
     'Alice': 'Captain',
     'Bob': 'Captain',
@@ -43,53 +42,83 @@ shift_requirements =\
 # specific shift requests by employees for days
 shift_requests =\
 [
-('A',0),
-('B',5),
-('C',8),
-('D',2),
-('E',9),
-('F',5),
-('G',1),
-('H',7),
-('A',3),
-('B',4),
-('C',4),
-('D',9),
-('F',1),
-('F',2),
-('F',3),
-('F',5),
-('F',7),
-('H',13)
+('Alice',0),
+('Bob',5),
+('John',8),
+('Sarah',2),
+('Mark',9),
+('Paul',5),
+('Peter',1),
+('Jay',7),
+('Alice',3),
+('Bob',4),
+('John',4),
+('Sarah',9),
+('Paul',1),
+('Paul',2),
+('Paul',3),
+('Paul',5),
+('Paul',7),
+('Jay',13)
 ]
 
 # Create employee scheduling scenari
 S = Scenario('employee_scheduling', horizon=n_days)
 
-AliceC = S.Resource('AliceCap')
-BobC = S.Resource('BobCap')
-JohnC = S.Resource('JohnCap')
-MarkF = S.Resource('MarkFO')
-PaulF = S.Resource('PaulFO')
-PeterF = S.Resource('PeterFO')
-
-#crewResources = {'%s_%s' % (person, role): S.Resource('%s_%s' % (person, role)) for person, role in employeeNames.iteritems() }
+# Build Resources for the Tasks
 crewResourcesFO = [S.Resource('%s_%s' % (person, role)) for person, role in employeeNames.iteritems() if role == "FO"]
 crewResourcesCaptain = [S.Resource('%s_%s' % (person, role)) for person, role in employeeNames.iteritems() if role == "Captain"]
 
-shiftTasks = {'D%dS%d' % (day, nbrShift): S.Task('Day%d_Shift%d' % (day, nbrShift), shift_requirements[day][nbrShift]) for day in days for nbrShift in range(len(shift_requirements[day])) }
+#shiftTasks = {'D%dS%d' % (day, nbrShift): S.Task('Day%d_Shift%d' % (day, nbrShift), shift_requirements[day][nbrShift]) for day in days for nbrShift in range(len(shift_requirements[day])) }
+shiftTasks = {(day, nbrShift): S.Task('Day%d_Shift%d' % (day, nbrShift), shift_requirements[day][nbrShift]) for day in days for nbrShift in range(len(shift_requirements[day])) }
 
-for day in days:
-    for nbrShift in range(len(shift_requirements[day])):
-        key = 'D%dS%d' % (day, nbrShift)
-        #shiftTasks[key] += {AliceC|BobC|JohnC, MarkF|PaulF|PeterF}
-        shiftTasks[key] += alt(crewResourcesFO), alt(crewResourcesCaptain)
+# distribute shifts to days
+for day, i in shiftTasks:
+    # Assign shift to its day
+    S += shiftTasks[day, i] >= day
+    # The shifts on each day are interchangeable, so add them to the same group
+    shiftTasks[day, i].group = day
+    # Weekend shifts get attribute week_end
+    if day % 7 in {5, 6}:
+        shiftTasks[day, i].week_end = 1
+
+        # Add resources to Tasks
+    shiftTasks[day, i] += alt(crewResourcesFO), alt(crewResourcesCaptain)
 
 
 print shiftTasks
-"""
-for day in shift_requirements:
-    print "Day is:", day
-    for i in range(shift_requirements[day]):
-        print "This is i", i
-"""
+
+time_limit = 10  # time limit for each run
+repeats = 5  # repeated random runs because CBC might get stuck
+
+
+
+## NEED TO FIGURE THIS OUT ##
+# Iteratively add shift requests until no solution exists
+employees = crewResourcesCaptain + crewResourcesFO
+for name, day in shift_requests:
+    resourceName = name+"_"+employeeNames[name]
+    S += employees[resourceName][day] >= 1
+    for i in range(repeats):
+        random_seed = random.randint(0, 10000)
+        start_time = time.time()
+        status = solvers.mip.solve(S, kind='CBC', time_limit=time_limit,
+                                   random_seed=random_seed, msg=0)
+        # Break when solution found
+        if status:
+            break
+    print(name, day, 'compute time:', time.time() - start_time)
+    # Break if all computed solution runs fail
+    if not status:
+        S -= employees[resourceName][day] >= 1
+        print('cant fit last shift request')
+
+# Plot the last computed solution
+#plotters.matplotlib.plot(S, fig_size=(12, 5))
+
+# Solve and plot scenario
+if solvers.mip.solve(S, kind='CBC', msg=1, random_seed=6):
+    print "The solution is", S.solution()
+    plotters.matplotlib.plot(S, fig_size=(12, 5))
+else:
+    print('no solution found')

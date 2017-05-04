@@ -61,9 +61,7 @@ S = Scenario('employee_scheduling', horizon=n_days)
 employees = {name: S.Resource(name) for name in employee_names}
 
 # Create shifts as tasks
-shifts = {(day, i): S.Task('S_%s_%s' % (str(day), str(i)))
-          for day in shift_requirements if day in days
-          for i in range(shift_requirements[day])}
+shifts = {(day, i): S.Task('S_%s_%s' % (str(day), str(i))) for day in shift_requirements if day in days for i in range(shift_requirements[day])}
 
 # distribute shifts to days
 for day, i in shifts:
