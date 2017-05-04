@@ -66,21 +66,24 @@ shift_requests =\
 # Create employee scheduling scenari
 S = Scenario('employee_scheduling', horizon=n_days)
 
-AliceCap = S.Resource('AliceCap')
-BobCap = S.Resource('BobCap')
-JohnCap = S.Resource('JohnCap')
-MarkFO = S.Resource('MarkFO')
-PaulFO = S.Resource('PaulFO')
-PeterFO = S.Resource('PeterFO')
+AliceC = S.Resource('AliceCap')
+BobC = S.Resource('BobCap')
+JohnC = S.Resource('JohnCap')
+MarkF = S.Resource('MarkFO')
+PaulF = S.Resource('PaulFO')
+PeterF = S.Resource('PeterFO')
 
-crewResources = {'%s_%s' % (person, role): S.Task('%s_%s' % (person, role)) for person, role in employeeNames.iteritems() }
+#crewResources = {'%s_%s' % (person, role): S.Resource('%s_%s' % (person, role)) for person, role in employeeNames.iteritems() }
+crewResourcesFO = [S.Resource('%s_%s' % (person, role)) for person, role in employeeNames.iteritems() if role == "FO"]
+crewResourcesCaptain = [S.Resource('%s_%s' % (person, role)) for person, role in employeeNames.iteritems() if role == "Captain"]
 
 shiftTasks = {'D%dS%d' % (day, nbrShift): S.Task('Day%d_Shift%d' % (day, nbrShift), shift_requirements[day][nbrShift]) for day in days for nbrShift in range(len(shift_requirements[day])) }
 
 for day in days:
     for nbrShift in range(len(shift_requirements[day])):
         key = 'D%dS%d' % (day, nbrShift)
-        shiftTasks[key] += {AliceCap|BobCap|JohnCap, MarkFO|PaulFO|PeterFO}
+        #shiftTasks[key] += {AliceC|BobC|JohnC, MarkF|PaulF|PeterF}
+        shiftTasks[key] += alt(crewResourcesFO), alt(crewResourcesCaptain)
 
 
 print shiftTasks
