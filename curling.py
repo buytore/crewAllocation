@@ -5,7 +5,7 @@ import math
 nbrTeams = 16
 totalNbrGames = nbrTeams - 1
 nbrSheets = 4
-nbrRounds = 4
+nbrRounds = 5
 
 rounds = {0: 4, 1: 4, 2: 4, 3: 2, 4: 1}
 
@@ -39,8 +39,8 @@ while drawStart < nbrTeams:
     drawStart = drawEnd
     drawEnd = drawEnd + nbrDraws
 
-S.use_makespan_objective()
+#S.use_makespan_objective()
 if solvers.mip.solve(S,msg=1):
-    plotters.matplotlib.plot(S,hide_resources=Teams,fig_size=(12,5))
+    plotters.matplotlib.plot(S, hide_resources=Teams, fig_size=(12,5))
 else:
     print('no solution found')
